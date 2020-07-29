@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         paint.apply {
             color = Color.RED
             style = Paint.Style.STROKE
-            strokeWidth = 6f
+            strokeWidth = 5f
         }
 
         firebaseVisionImage = FirebaseVisionImage.fromBitmap(mBitmap)
@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
                         val bounds = face.boundingBox
                         canvas.drawRect(bounds, paint)
 
-                        //landmark
+                        //landmark ears
                         val leftEar = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EAR)
                         leftEar?.let {
                             val pos = it.position
@@ -104,6 +104,28 @@ class MainActivity : AppCompatActivity() {
                             )
                             canvas.drawRect(rect, paint)
                         }
+
+                        //landmark mouth
+                        val mouthLeft = face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_LEFT)
+                        val mouthRight = face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_RIGHT)
+                        val mouthBottom = face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_BOTTOM)
+                        mouthLeft?.let {
+                            val leftPos = it.position
+                            mouthRight?.let { it1 ->
+                                val rightPos = it1.position
+                                mouthBottom?.let { it2 ->
+                                    val bottomPos = it2.position
+                                    val path = Path().apply {
+                                        moveTo(leftPos.x - 5, rightPos.y - 5)
+                                        lineTo(rightPos.x + 5, rightPos.y - 5)
+                                        lineTo(bottomPos.x, bottomPos.y + 5)
+                                        close()
+                                    }
+                                    canvas.drawPath(path, paint)
+                                }
+                            }
+                        }
+
                     }
                     imageViewFace.setImageBitmap(mBitmap)
                 }
