@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         paint.apply {
             color = Color.RED
             style = Paint.Style.STROKE
-            strokeWidth = 5f
+            strokeWidth = 4f
         }
 
         firebaseVisionImage = FirebaseVisionImage.fromBitmap(mBitmap)
@@ -150,6 +150,18 @@ class MainActivity : AppCompatActivity() {
                             canvas.drawRect(rect, paint)
                         }
 
+                        //landmark nose
+                        val noseBase = face.getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE)
+                        noseBase?.let {
+                            val pos = it.position
+                            val rect = Rect(
+                                    pos.x.toInt() - 30,
+                                    pos.y.toInt() - 20,
+                                    pos.x.toInt() + 30,
+                                    pos.y.toInt() + 10
+                            )
+                            canvas.drawRect(rect, paint)
+                        }
                     }
                     imageViewFace.setImageBitmap(mBitmap)
                 }
