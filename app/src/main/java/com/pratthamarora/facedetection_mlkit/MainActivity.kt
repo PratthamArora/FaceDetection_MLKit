@@ -2,13 +2,18 @@ package com.pratthamarora.facedetection_mlkit
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
+import android.graphics.*
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.ml.vision.FirebaseVision
+import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -18,9 +23,25 @@ class MainActivity : AppCompatActivity() {
         const val IMAGE_PICKER = 100
     }
 
+    private val options by lazy {
+        FirebaseVisionFaceDetectorOptions.Builder()
+                .setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
+                .setLandmarkMode(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS)
+                .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
+                .build()
+    }
+    private lateinit var firebaseVisionImage: FirebaseVisionImage
+    private lateinit var firebaseVisionFaceDetector: FirebaseVisionFaceDetector
+    private lateinit var paint: Paint
+    private lateinit var canvas: Canvas
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        firebaseVisionFaceDetector = FirebaseVision.getInstance()
+                .getVisionFaceDetector(options)
 
         selectImageBtn.setOnClickListener {
             getImageFromLocal()
@@ -36,13 +57,70 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun detectFace(bmp: Bitmap) {
+        val scaledBitmap = Bitmap.createScaledBitmap(
+                bmp,
+                480,
+                480,
+                true
+        )
+        val mBitmap = scaledBitmap.copy(Bitmap.Config.ARGB_8888, true)
+
+        canvas = Canvas(mBitmap)
+        paint = Paint()
+        paint.apply {
+            color = Color.RED
+            style = Paint.Style.STROKE
+            strokeWidth = 6f
+        }
+
+        firebaseVisionImage = FirebaseVisionImage.fromBitmap(mBitmap)
+        firebaseVisionFaceDetector.detectInImage(firebaseVisionImage)
+                .addOnSuccessListener { faces ->
+                    for (face in faces) {
+                        val bounds = face.boundingBox
+                        canvas.drawRect(bounds, paint)
+
+                        //landmark
+                        val leftEar = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EAR)
+                        leftEar?.let {
+                            val pos = it.position
+                            val rect = Rect(
+                                    pos.x.toInt() - 20,
+                                    pos.y.toInt() - 30,
+                                    pos.x.toInt() + 5,
+                                    pos.y.toInt() + 30
+                            )
+                            canvas.drawRect(rect, paint)
+                        }
+                        val rightEar = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EAR)
+                        rightEar?.let {
+                            val pos = it.position
+                            val rect = Rect(
+                                    pos.x.toInt() + 20,
+                                    pos.y.toInt() - 30,
+                                    pos.x.toInt() + 5,
+                                    pos.y.toInt() + 30
+                            )
+                            canvas.drawRect(rect, paint)
+                        }
+                    }
+                    imageViewFace.setImageBitmap(mBitmap)
+                }
+                .addOnFailureListener {
+                    Log.d(TAG, "detectFace: $it")
+                }
+
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == IMAGE_PICKER) {
             if (resultCode == Activity.RESULT_OK) {
                 val uri = data?.data
                 val bitmap = uri?.let { getBitmap(it) }
-                imageViewFace.setImageBitmap(bitmap)
+//                imageViewFace.setImageBitmap(bitmap)
+                bitmap?.let { detectFace(it) }
             }
         }
     }
