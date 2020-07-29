@@ -126,6 +126,30 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
 
+                        //landmark eye
+                        val leftEye = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE)
+                        val rightEye = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE)
+                        leftEye?.let {
+                            val pos = it.position
+                            val rect = Rect(
+                                    pos.x.toInt() - 30,
+                                    pos.y.toInt() - 10,
+                                    pos.x.toInt() + 20,
+                                    pos.y.toInt() + 10
+                            )
+                            canvas.drawRect(rect, paint)
+                        }
+                        rightEye?.let {
+                            val pos = it.position
+                            val rect = Rect(
+                                    pos.x.toInt() - 20,
+                                    pos.y.toInt() - 10,
+                                    pos.x.toInt() + 20,
+                                    pos.y.toInt() + 10
+                            )
+                            canvas.drawRect(rect, paint)
+                        }
+
                     }
                     imageViewFace.setImageBitmap(mBitmap)
                 }
