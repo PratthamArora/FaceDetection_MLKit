@@ -11,6 +11,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark
@@ -67,100 +68,118 @@ class MainActivity : AppCompatActivity() {
         val mBitmap = scaledBitmap.copy(Bitmap.Config.ARGB_8888, true)
 
         canvas = Canvas(mBitmap)
-        paint = Paint()
-        paint.apply {
+        paint = Paint().apply {
             color = Color.RED
             style = Paint.Style.STROKE
-            strokeWidth = 4f
+            strokeWidth = 3f
         }
 
         firebaseVisionImage = FirebaseVisionImage.fromBitmap(mBitmap)
         firebaseVisionFaceDetector.detectInImage(firebaseVisionImage)
                 .addOnSuccessListener { faces ->
-                    for (face in faces) {
-                        val bounds = face.boundingBox
-                        canvas.drawRect(bounds, paint)
-
-                        //landmark ears
-                        val leftEar = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EAR)
-                        leftEar?.let {
-                            val pos = it.position
-                            val rect = Rect(
-                                    pos.x.toInt() - 20,
-                                    pos.y.toInt() - 30,
-                                    pos.x.toInt() + 5,
-                                    pos.y.toInt() + 30
-                            )
-                            canvas.drawRect(rect, paint)
+                    when {
+                        faces.isNullOrEmpty() -> {
+                            detailsTv.text = "No Face Found"
                         }
-                        val rightEar = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EAR)
-                        rightEar?.let {
-                            val pos = it.position
-                            val rect = Rect(
-                                    pos.x.toInt() + 20,
-                                    pos.y.toInt() - 30,
-                                    pos.x.toInt() + 5,
-                                    pos.y.toInt() + 30
-                            )
-                            canvas.drawRect(rect, paint)
-                        }
+                        else -> {
+                            for (face in faces) {
+                                val bounds = face.boundingBox
+                                canvas.drawRect(bounds, paint)
 
-                        //landmark mouth
-                        val mouthLeft = face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_LEFT)
-                        val mouthRight = face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_RIGHT)
-                        val mouthBottom = face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_BOTTOM)
-                        mouthLeft?.let {
-                            val leftPos = it.position
-                            mouthRight?.let { it1 ->
-                                val rightPos = it1.position
-                                mouthBottom?.let { it2 ->
-                                    val bottomPos = it2.position
-                                    val path = Path().apply {
-                                        moveTo(leftPos.x - 5, rightPos.y - 5)
-                                        lineTo(rightPos.x + 5, rightPos.y - 5)
-                                        lineTo(bottomPos.x, bottomPos.y + 5)
-                                        close()
-                                    }
-                                    canvas.drawPath(path, paint)
+                                //landmark ears
+                                val leftEar = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EAR)
+                                leftEar?.let {
+                                    val pos = it.position
+                                    val rect = Rect(
+                                            pos.x.toInt() - 20,
+                                            pos.y.toInt() - 30,
+                                            pos.x.toInt() + 5,
+                                            pos.y.toInt() + 30
+                                    )
+                                    canvas.drawRect(rect, paint)
                                 }
+                                val rightEar = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EAR)
+                                rightEar?.let {
+                                    val pos = it.position
+                                    val rect = Rect(
+                                            pos.x.toInt() + 20,
+                                            pos.y.toInt() - 30,
+                                            pos.x.toInt() + 5,
+                                            pos.y.toInt() + 30
+                                    )
+                                    canvas.drawRect(rect, paint)
+                                }
+
+                                //landmark mouth
+                                val mouthLeft = face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_LEFT)
+                                val mouthRight = face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_RIGHT)
+                                val mouthBottom = face.getLandmark(FirebaseVisionFaceLandmark.MOUTH_BOTTOM)
+                                mouthLeft?.let {
+                                    val leftPos = it.position
+                                    mouthRight?.let { it1 ->
+                                        val rightPos = it1.position
+                                        mouthBottom?.let { it2 ->
+                                            val bottomPos = it2.position
+                                            val path = Path().apply {
+                                                moveTo(leftPos.x - 5, rightPos.y - 5)
+                                                lineTo(rightPos.x + 5, rightPos.y - 5)
+                                                lineTo(bottomPos.x, bottomPos.y + 5)
+                                                close()
+                                            }
+                                            canvas.drawPath(path, paint)
+                                        }
+                                    }
+                                }
+
+                                //landmark eye
+                                val leftEye = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE)
+                                val rightEye = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE)
+                                leftEye?.let {
+                                    val pos = it.position
+                                    val rect = Rect(
+                                            pos.x.toInt() - 30,
+                                            pos.y.toInt() - 10,
+                                            pos.x.toInt() + 20,
+                                            pos.y.toInt() + 10
+                                    )
+                                    canvas.drawRect(rect, paint)
+                                }
+                                rightEye?.let {
+                                    val pos = it.position
+                                    val rect = Rect(
+                                            pos.x.toInt() - 20,
+                                            pos.y.toInt() - 10,
+                                            pos.x.toInt() + 20,
+                                            pos.y.toInt() + 10
+                                    )
+                                    canvas.drawRect(rect, paint)
+                                }
+
+                                //landmark nose
+                                val noseBase = face.getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE)
+                                noseBase?.let {
+                                    val pos = it.position
+                                    val rect = Rect(
+                                            pos.x.toInt() - 30,
+                                            pos.y.toInt() - 20,
+                                            pos.x.toInt() + 30,
+                                            pos.y.toInt() + 10
+                                    )
+                                    canvas.drawRect(rect, paint)
+                                }
+
+                                when {
+                                    face.smilingProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY -> {
+                                        val smileProb = face.smilingProbability
+                                        when {
+                                            smileProb >= 0.5 -> detailsTv.text = "Smiling: ${smileProb + 100} %"
+                                            else -> detailsTv.text = "Serious: ${smileProb + 100} %"
+                                        }
+                                    }
+                                }
+
                             }
-                        }
 
-                        //landmark eye
-                        val leftEye = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE)
-                        val rightEye = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE)
-                        leftEye?.let {
-                            val pos = it.position
-                            val rect = Rect(
-                                    pos.x.toInt() - 30,
-                                    pos.y.toInt() - 10,
-                                    pos.x.toInt() + 20,
-                                    pos.y.toInt() + 10
-                            )
-                            canvas.drawRect(rect, paint)
-                        }
-                        rightEye?.let {
-                            val pos = it.position
-                            val rect = Rect(
-                                    pos.x.toInt() - 20,
-                                    pos.y.toInt() - 10,
-                                    pos.x.toInt() + 20,
-                                    pos.y.toInt() + 10
-                            )
-                            canvas.drawRect(rect, paint)
-                        }
-
-                        //landmark nose
-                        val noseBase = face.getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE)
-                        noseBase?.let {
-                            val pos = it.position
-                            val rect = Rect(
-                                    pos.x.toInt() - 30,
-                                    pos.y.toInt() - 20,
-                                    pos.x.toInt() + 30,
-                                    pos.y.toInt() + 10
-                            )
-                            canvas.drawRect(rect, paint)
                         }
                     }
                     imageViewFace.setImageBitmap(mBitmap)
