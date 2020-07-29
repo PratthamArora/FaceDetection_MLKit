@@ -29,14 +29,39 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:scaleType="fitCenter"
-        app:layout_constraintBottom_toTopOf="@+id/detailsTv"
+        app:layout_constraintBottom_toTopOf="@+id/smileProbTV"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_launcher_background" />
 
     <TextView
-        android:id="@+id/detailsTv"
+        android:id="@+id/smileProbTV"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:fontFamily="sans-serif-black"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/leftEyeProb"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imageViewFace"
+        tools:text="smileProb" />
+
+    <TextView
+        android:id="@+id/leftEyeProb"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:fontFamily="sans-serif-black"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/rightEyeProb"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="leftEyeProb" />
+
+    <TextView
+        android:id="@+id/rightEyeProb"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
@@ -45,6 +70,6 @@
         app:layout_constraintBottom_toTopOf="@+id/selectImageBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/imageViewFace"
-        tools:text="TextView" />
+        tools:text="rightEyeProb" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

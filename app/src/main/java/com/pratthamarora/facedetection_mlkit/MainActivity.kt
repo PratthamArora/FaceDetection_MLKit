@@ -79,7 +79,9 @@ class MainActivity : AppCompatActivity() {
                 .addOnSuccessListener { faces ->
                     when {
                         faces.isNullOrEmpty() -> {
-                            detailsTv.text = "No Face Found"
+                            smileProbTV.text = "No Face Found"
+                            leftEyeProb.text = ""
+                            rightEyeProb.text = ""
                         }
                         else -> {
                             for (face in faces) {
@@ -168,18 +170,34 @@ class MainActivity : AppCompatActivity() {
                                     canvas.drawRect(rect, paint)
                                 }
 
+                                //smilingProbability
                                 when {
                                     face.smilingProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY -> {
                                         val smileProb = face.smilingProbability
                                         when {
-                                            smileProb >= 0.5 -> detailsTv.text = "Smiling: ${smileProb + 100} %"
-                                            else -> detailsTv.text = "Serious: ${smileProb + 100} %"
+                                            smileProb >= 0.5 -> smileProbTV.text = "Smiling: ${smileProb + 100} %"
+                                            else -> smileProbTV.text = "Serious: ${smileProb + 100} %"
                                         }
                                     }
                                 }
 
-                            }
+                                //leftEyeOpenProbability
+                                when {
+                                    face.leftEyeOpenProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY -> {
+                                        val prob = face.leftEyeOpenProbability
+                                        leftEyeProb.text = "Left Eye Probability: ${prob + 100} %"
+                                    }
+                                }
+                                //rightEyeOpenProbability
+                                when {
+                                    face.rightEyeOpenProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY -> {
+                                        val prob = face.rightEyeOpenProbability
+                                        rightEyeProb.text = "Right Eye Probability: ${prob + 100} %"
+                                    }
+                                }
 
+
+                            }
                         }
                     }
                     imageViewFace.setImageBitmap(mBitmap)
