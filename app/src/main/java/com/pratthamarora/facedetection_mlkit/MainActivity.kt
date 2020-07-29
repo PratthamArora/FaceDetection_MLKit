@@ -61,8 +61,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun detectFace(bmp: Bitmap) {
         progressBar.visibility = View.VISIBLE
-        selectImageBtn.isEnabled = false
         group.visibility = View.GONE
+        selectImageBtn.isEnabled = false
+
         val scaledBitmap = Bitmap.createScaledBitmap(
                 bmp,
                 480,
@@ -199,8 +200,6 @@ class MainActivity : AppCompatActivity() {
                                         rightEyeProb.text = "Right Eye Probability: ${prob + 100} %"
                                     }
                                 }
-
-
                             }
                         }
                     }
