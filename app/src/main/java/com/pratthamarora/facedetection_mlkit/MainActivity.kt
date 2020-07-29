@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
@@ -59,6 +60,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun detectFace(bmp: Bitmap) {
+        progressBar.visibility = View.VISIBLE
+        selectImageBtn.isEnabled = false
+        group.visibility = View.GONE
         val scaledBitmap = Bitmap.createScaledBitmap(
                 bmp,
                 480,
@@ -200,7 +204,11 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                     }
+                    progressBar.visibility = View.GONE
+                    group.visibility = View.VISIBLE
                     imageViewFace.setImageBitmap(mBitmap)
+                    selectImageBtn.isEnabled = true
+
                 }
                 .addOnFailureListener {
                     Log.d(TAG, "detectFace: $it")
@@ -214,7 +222,6 @@ class MainActivity : AppCompatActivity() {
             if (resultCode == Activity.RESULT_OK) {
                 val uri = data?.data
                 val bitmap = uri?.let { getBitmap(it) }
-//                imageViewFace.setImageBitmap(bitmap)
                 bitmap?.let { detectFace(it) }
             }
         }
