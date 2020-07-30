@@ -180,8 +180,8 @@ class MainActivity : AppCompatActivity() {
                                     face.smilingProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY -> {
                                         val smileProb = face.smilingProbability
                                         when {
-                                            smileProb >= 0.5 -> smileProbTV.text = "Smiling: ${smileProb + 100} %"
-                                            else -> smileProbTV.text = "Serious: ${smileProb + 100} %"
+                                            smileProb >= 0.5 -> smileProbTV.text = "Smiling: ${smileProb * 100 } "
+                                            else -> smileProbTV.text = "Serious: ${smileProb * 100} %"
                                         }
                                     }
                                 }
@@ -190,14 +190,14 @@ class MainActivity : AppCompatActivity() {
                                 when {
                                     face.leftEyeOpenProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY -> {
                                         val prob = face.leftEyeOpenProbability
-                                        leftEyeProb.text = "Left Eye Probability: ${prob + 100} %"
+                                        leftEyeProb.text = "Left Eye Probability: ${prob * 100 } %"
                                     }
                                 }
                                 //rightEyeOpenProbability
                                 when {
                                     face.rightEyeOpenProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY -> {
                                         val prob = face.rightEyeOpenProbability
-                                        rightEyeProb.text = "Right Eye Probability: ${prob + 100} %"
+                                        rightEyeProb.text = "Right Eye Probability: ${prob * 100} %"
                                     }
                                 }
                             }
